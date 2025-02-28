@@ -4,7 +4,495 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camelot Wheel</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --background: #f5f5f7;
+            --card-bg: #ffffff;
+            --text: #1d1d1f;
+            --border: #d2d2d7;
+            --primary: #0071e3;
+            --perfect-match: #34c759;
+            --compatible: #5ac8fa;
+            --relative: #af52de;
+            --energy-boost: #ff9500;
+            --divider: #e5e5ea;
+            --shadow: rgba(0, 0, 0, 0.1);
+            
+            --primary-rgb: 0, 113, 227;
+            --perfect-match-rgb: 52, 199, 89;
+            --compatible-rgb: 90, 200, 250;
+            --relative-rgb: 175, 82, 222;
+            --energy-boost-rgb: 255, 149, 0;
+        }
+        
+        [data-theme="dark"] {
+            --background: #1d1d1f;
+            --card-bg: #2c2c2e;
+            --text: #f5f5f7;
+            --border: #3a3a3c;
+            --primary: #0a84ff;
+            --perfect-match: #30d158;
+            --compatible: #64d2ff;
+            --relative: #bf5af2;
+            --energy-boost: #ff9f0a;
+            --divider: #38383a;
+            --shadow: rgba(0, 0, 0, 0.3);
+            
+            --primary-rgb: 10, 132, 255;
+            --perfect-match-rgb: 48, 209, 88;
+            --compatible-rgb: 100, 210, 255;
+            --relative-rgb: 191, 90, 242;
+            --energy-boost-rgb: 255, 159, 10;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            height: 36px;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+        
+        .toggle-btn {
+            background: none;
+            border: none;
+            padding: 0 15px;
+            height: 100%;
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .toggle-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 18px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            background-color: var(--card-bg);
+            cursor: pointer;
+            box-shadow: 0 2px 10px var(--shadow);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+        
+        .theme-toggle svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+        
+        main {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        /* Box Layout */
+        .box-layout {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 15px;
+        }
+        
+        .key-group {
+            width: 100%;
+        }
+        
+        .key-group-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+            opacity: 0.7;
+        }
+        
+        .key-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            width: 100%;
+        }
+        
+        @media (max-width: 500px) {
+            .key-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .key-box {
+            aspect-ratio: 1/0.75;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px var(--shadow);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .key-box:active {
+            transform: scale(0.96);
+        }
+        
+        .key-label {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .compatibility-label {
+            font-size: 8px;
+            font-weight: 500;
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .key-box.selected {
+            box-shadow: 0 0 0 2px var(--primary), 0 4px 12px var(--shadow);
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .key-box.perfect-match {
+            background-color: rgba(var(--perfect-match-rgb), 0.15);
+            box-shadow: 0 0 0 1px var(--perfect-match), 0 4px 12px var(--shadow);
+        }
+        
+        .key-box.perfect-match .compatibility-label {
+            color: var(--perfect-match);
+            opacity: 1;
+        }
+        
+        .key-box.compatible {
+            background-color: rgba(var(--compatible-rgb), 0.15);
+            box-shadow: 0 0 0 1px var(--compatible), 0 4px 12px var(--shadow);
+        }
+        
+        .key-box.compatible .compatibility-label {
+            color: var(--compatible);
+            opacity: 1;
+        }
+        
+        .key-box.relative {
+            background-color: rgba(var(--relative-rgb), 0.15);
+            box-shadow: 0 0 0 1px var(--relative), 0 4px 12px var(--shadow);
+        }
+        
+        .key-box.relative .compatibility-label {
+            color: var(--relative);
+            opacity: 1;
+        }
+        
+        .key-box.energy-boost {
+            background-color: rgba(var(--energy-boost-rgb), 0.15);
+            box-shadow: 0 0 0 1px var(--energy-boost), 0 4px 12px var(--shadow);
+        }
+        
+        .key-box.energy-boost .compatibility-label {
+            color: var(--energy-boost);
+            opacity: 1;
+        }
+        
+        /* Wheel Layout */
+        .wheel-layout {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .wheel-container {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1/1;
+            position: relative;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--card-bg);
+            box-shadow: 0 4px 20px var(--shadow);
+            margin: 0 auto;
+        }
+        
+        .wheel-inner, .wheel-outer {
+            position: absolute;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .wheel-inner {
+            width: 65%;
+            height: 65%;
+            border-radius: 50%;
+            background-color: rgba(var(--relative-rgb), 0.1);
+            z-index: 1;
+        }
+        
+        .wheel-segment {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            background-color: var(--card-bg);
+            color: var(--text);
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 2px 8px var(--shadow);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 2;
+        }
+        
+        .wheel-segment:hover {
+            transform: scale(1.1);
+        }
+        
+        .wheel-segment.minor {
+            border: 2px solid var(--relative);
+        }
+        
+        .wheel-segment.major {
+            border: 2px solid var(--primary);
+        }
+        
+        .wheel-segment.selected {
+            background-color: var(--primary);
+            color: white;
+            transform: scale(1.15);
+            z-index: 3;
+        }
+        
+        .wheel-segment.compatible {
+            background-color: var(--compatible);
+            color: white;
+        }
+        
+        .wheel-segment.perfect-match {
+            background-color: var(--perfect-match);
+            color: white;
+        }
+        
+        .wheel-segment.relative {
+            background-color: var(--relative);
+            color: white;
+        }
+        
+        .wheel-segment.energy-boost {
+            background-color: var(--energy-boost);
+            color: white;
+        }
+        
+        .wheel-connector {
+            position: absolute;
+            background-color: var(--divider);
+            z-index: 0;
+            transform-origin: center;
+        }
+        
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        .legend-color.selected {
+            background-color: var(--primary);
+        }
+        
+        .legend-color.perfect-match {
+            background-color: var(--perfect-match);
+        }
+        
+        .legend-color.compatible {
+            background-color: var(--compatible);
+        }
+        
+        .legend-color.relative {
+            background-color: var(--relative);
+        }
+        
+        .legend-color.energy-boost {
+            background-color: var(--energy-boost);
+        }
+        
+        .info-panel {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            box-shadow: 0 4px 20px var(--shadow);
+            display: none;
+        }
+        
+        .info-panel.active {
+            display: block;
+        }
+        
+        .info-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #86868b;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .rules-panel {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            box-shadow: 0 4px 20px var(--shadow);
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .rules-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .rules-list {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .rules-list h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 12px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        
+        .rules-list ul {
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -35,11 +523,26 @@
     
     <main>
         <!-- Box Layout (Default) -->
-        <div class="box-layout" id="box-layout"></div>
+        <div class="box-layout" id="box-layout">
+            <!-- Minor Keys (A) Group -->
+            <div class="key-group">
+                <div class="key-group-title">Minor Keys (A)</div>
+                <div class="key-grid" id="minor-keys-grid"></div>
+            </div>
+            
+            <!-- Major Keys (B) Group -->
+            <div class="key-group">
+                <div class="key-group-title">Major Keys (B)</div>
+                <div class="key-grid" id="major-keys-grid"></div>
+            </div>
+        </div>
         
         <!-- Wheel Layout -->
         <div class="wheel-layout" id="wheel-layout" style="display: none;">
-            <div class="wheel-container" id="wheel-container"></div>
+            <div class="wheel-container" id="wheel-container">
+                <div class="wheel-inner"></div>
+                <!-- Segments will be added dynamically -->
+            </div>
         </div>
         
         <!-- Legend -->
@@ -49,20 +552,20 @@
                 <span>Selected</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color same-energy"></div>
-                <span>Same Energy</span>
+                <div class="legend-color perfect-match"></div>
+                <span>Perfect Match</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color compatible"></div>
+                <span>Compatible</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color relative"></div>
+                <span>Relative</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color energy-boost"></div>
                 <span>Energy Boost</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color energy-drop"></div>
-                <span>Energy Drop</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color perfect-match"></div>
-                <span>Perfect Match</span>
             </div>
         </div>
         
@@ -79,746 +582,438 @@
                     <div class="info-value" id="musical-notation">-</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Same Energy</div>
-                    <div class="info-value" id="same-energy-key">-</div>
+                    <div class="info-label">Perfect Match</div>
+                    <div class="info-value" id="perfect-match-key">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Compatible Keys</div>
+                    <div class="info-value" id="compatible-keys">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Relative Major/Minor</div>
+                    <div class="info-value" id="relative-key">-</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Energy Boost</div>
-                    <div class="info-value" id="energy-boost-key">-</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Energy Drop</div>
-                    <div class="info-value" id="energy-drop-key">-</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Perfect Match</div>
-                    <div class="info-value" id="perfect-match-key">-</div>
+                    <div class="info-value" id="energy-boost-keys">-</div>
                 </div>
             </div>
         </div>
     </main>
     
-    <script src="script.js"></script>
+    <script>
+        // Define the wheel data for both notation types
+        const wheelData = [
+            // Minor keys (A)
+            { position: "1A", musical: "B♭m", type: "minor" },
+            { position: "2A", musical: "Fm", type: "minor" },
+            { position: "3A", musical: "Cm", type: "minor" },
+            { position: "4A", musical: "Gm", type: "minor" },
+            { position: "5A", musical: "Dm", type: "minor" },
+            { position: "6A", musical: "Am", type: "minor" },
+            { position: "7A", musical: "Em", type: "minor" },
+            { position: "8A", musical: "Bm", type: "minor" },
+            { position: "9A", musical: "F♯m", type: "minor" },
+            { position: "10A", musical: "C♯m", type: "minor" },
+            { position: "11A", musical: "G♯m", type: "minor" },
+            { position: "12A", musical: "E♭m", type: "minor" },
+            
+            // Major keys (B)
+            { position: "1B", musical: "D♭M", type: "major" },
+            { position: "2B", musical: "A♭M", type: "major" },
+            { position: "3B", musical: "E♭M", type: "major" },
+            { position: "4B", musical: "B♭M", type: "major" },
+            { position: "5B", musical: "FM", type: "major" },
+            { position: "6B", musical: "CM", type: "major" },
+            { position: "7B", musical: "GM", type: "major" },
+            { position: "8B", musical: "DM", type: "major" },
+            { position: "9B", musical: "AM", type: "major" },
+            { position: "10B", musical: "EM", type: "major" },
+            { position: "11B", musical: "BM", type: "major" },
+            { position: "12B", musical: "G♭M", type: "major" },
+        ];
+
+        // App state
+        let showAlphanumeric = true;
+        let viewMode = 'box';
+        let isDarkMode = false;
+        let selectedKey = null;
+
+        // DOM references
+        const boxLayout = document.getElementById('box-layout');
+        const minorKeysGrid = document.getElementById('minor-keys-grid');
+        const majorKeysGrid = document.getElementById('major-keys-grid');
+        const wheelLayout = document.getElementById('wheel-layout');
+        const wheelContainer = document.getElementById('wheel-container');
+        const boxToggle = document.getElementById('box-toggle');
+        const wheelToggle = document.getElementById('wheel-toggle');
+        const alphaToggle = document.getElementById('alpha-toggle');
+        const musicalToggle = document.getElementById('musical-toggle');
+        const themeToggle = document.getElementById('theme-toggle');
+        const lightIcon = document.getElementById('light-icon');
+        const darkIcon = document.getElementById('dark-icon');
+        const themeText = document.getElementById('theme-text');
+        const infoPanel = document.getElementById('info-panel');
+        const selectedKeyElement = document.getElementById('selected-key');
+        const musicalNotationElement = document.getElementById('musical-notation');
+        const perfectMatchElement = document.getElementById('perfect-match-key');
+        const compatibleKeysElement = document.getElementById('compatible-keys');
+        const relativeKeyElement = document.getElementById('relative-key');
+        const energyBoostElement = document.getElementById('energy-boost-keys');
+
+        // Toggle view mode
+        boxToggle.addEventListener('click', () => {
+            viewMode = 'box';
+            boxToggle.classList.add('active');
+            wheelToggle.classList.remove('active');
+            boxLayout.style.display = 'flex';
+            wheelLayout.style.display = 'none';
+            renderView();
+            if (selectedKey) {
+                selectKey(selectedKey);
+            }
+        });
+
+        wheelToggle.addEventListener('click', () => {
+            viewMode = 'wheel';
+            wheelToggle.classList.add('active');
+            boxToggle.classList.remove('active');
+            boxLayout.style.display = 'none';
+            wheelLayout.style.display = 'flex';
+            renderView();
+            if (selectedKey) {
+                selectKey(selectedKey);
+            }
+        });
+
+        // Toggle notation
+        alphaToggle.addEventListener('click', () => {
+            showAlphanumeric = true;
+            alphaToggle.classList.add('active');
+            musicalToggle.classList.remove('active');
+            renderView();
+            if (selectedKey) {
+                updateInfoPanel();
+                selectKey(selectedKey);
+            }
+        });
+
+        musicalToggle.addEventListener('click', () => {
+            showAlphanumeric = false;
+            musicalToggle.classList.add('active');
+            alphaToggle.classList.remove('active');
+            renderView();
+            if (selectedKey) {
+                updateInfoPanel();
+                selectKey(selectedKey);
+            }
+        });
+
+        // Toggle theme
+        themeToggle.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
+                document.body.setAttribute('data-theme', 'dark');
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'block';
+                themeText.textContent = 'Light Mode';
+            } else {
+                document.body.removeAttribute('data-theme');
+                lightIcon.style.display = 'block';
+                darkIcon.style.display = 'none';
+                themeText.textContent = 'Dark Mode';
+            }
+        });
+
+        // Create the box layout
+        function createBoxLayout() {
+            minorKeysGrid.innerHTML = '';
+            majorKeysGrid.innerHTML = '';
+            
+            // Minor keys (A)
+            const minorKeys = wheelData.filter(key => key.type === 'minor');
+            minorKeys.forEach(keyData => {
+                const box = createKeyBox(keyData);
+                minorKeysGrid.appendChild(box);
+            });
+            
+            // Major keys (B)
+            const majorKeys = wheelData.filter(key => key.type === 'major');
+            majorKeys.forEach(keyData => {
+                const box = createKeyBox(keyData);
+                majorKeysGrid.appendChild(box);
+            });
+        }
+        
+        function createKeyBox(keyData) {
+            const box = document.createElement('div');
+            box.className = 'key-box';
+            box.setAttribute('data-position', keyData.position);
+            
+            const label = document.createElement('div');
+            label.className = 'key-label';
+            label.textContent = showAlphanumeric ? keyData.position : keyData.musical;
+            
+            const compatibility = document.createElement('div');
+            compatibility.className = 'compatibility-label';
+            
+            box.appendChild(label);
+            box.appendChild(compatibility);
+            
+            // Add click event
+            box.addEventListener('click', () => {
+                selectKey(keyData);
+            });
+            
+            return box;
+        }
+
+        // Create the wheel layout
+        function createWheelLayout() {
+            wheelContainer.innerHTML = '<div class="wheel-inner"></div>';
+            
+            // Calculate positions on the circle
+            const radius = 150;
+            const centerX = 200;
+            const centerY = 200;
+            
+            // Create segments for each key
+            wheelData.forEach(keyData => {
+                // Extract position number
+                const positionMatch = keyData.position.match(/(\d+)/);
+                const position = positionMatch ? parseInt(positionMatch[0]) : 0;
+                
+                // Calculate angle and position
+                const angle = (position - 1) * 30 * (Math.PI / 180);
+                const isMinor = keyData.position.endsWith('A');
+                
+                // Place minor keys on inner circle, major keys on outer circle
+                const segmentRadius = isMinor ? radius * 0.6 : radius * 0.9;
+                const x = centerX + segmentRadius * Math.cos(angle);
+                const y = centerY + segmentRadius * Math.sin(angle);
+                
+                const segment = document.createElement('div');
+                segment.className = `wheel-segment ${keyData.type}`;
+                segment.setAttribute('data-position', keyData.position);
+                segment.style.left = `${x - 24}px`;
+                segment.style.top = `${y - 24}px`;
+                segment.textContent = showAlphanumeric ? keyData.position : keyData.musical;
+                
+                segment.addEventListener('click', () => {
+                    selectKey(keyData);
+                });
+                
+                wheelContainer.appendChild(segment);
+            });
+        }
+
+        // Get compatible keys based on new rules
+        function getCompatibleKeys(keyData) {
+            const positionMatch = keyData.position.match(/(\d+)/);
+            const position = positionMatch ? parseInt(positionMatch[0]) : 0;
+            const isMinor = keyData.position.endsWith('A');
+            const keyType = isMinor ? 'A' : 'B';
+            
+            // 1. Perfect Match (same key)
+            const perfectMatch = keyData;
+            
+            // 2. Compatible keys (adjacent keys, harmonic mixing)
+            const compatibleKeys = [];
+            
+            
+            // X+1 (wrap 12->1)
+            let nextPos = position + 1;
+            if (nextPos > 12) nextPos = 1;
+            compatibleKeys.push(wheelData.find(k => k.position === `${nextPos}${keyType}`));
+            
+            // X-1 (wrap 1->12)
+            let prevPos = position - 1;
+            if (prevPos < 1) prevPos = 12;
+            compatibleKeys.push(wheelData.find(k => k.position === `${prevPos}${keyType}`));
+            
+            // 3. Relative Major/Minor (same number, different letter)
+            const relativeType = isMinor ? 'B' : 'A';
+            const relativeKey = wheelData.find(k => k.position === `${position}${relativeType}`);
+            
+            // 4. Energy Boost Mixing
+            const energyBoostKeys = [];
+            
+            // X+2
+            let boost2Pos = position + 2;
+            if (boost2Pos > 12) boost2Pos = boost2Pos - 12;
+            energyBoostKeys.push(wheelData.find(k => k.position === `${boost2Pos}${keyType}`));
+            
+            // X+5
+            let boost5Pos = position + 5;
+            if (boost5Pos > 12) boost5Pos = boost5Pos - 12;
+            energyBoostKeys.push(wheelData.find(k => k.position === `${boost5Pos}${keyType}`));
+            
+            // X+7
+            let boost7Pos = position + 7;
+            if (boost7Pos > 12) boost7Pos = boost7Pos - 12;
+            energyBoostKeys.push(wheelData.find(k => k.position === `${boost7Pos}${keyType}`));
+            
+            return {
+                perfectMatch,
+                compatibleKeys,
+                relativeKey,
+                energyBoostKeys
+            };
+        }
+
+        // Select a key
+        function selectKey(keyData) {
+            selectedKey = keyData;
+            infoPanel.classList.add('active');
+            updateInfoPanel();
+            
+            // Clear all existing highlights
+            document.querySelectorAll('.key-box').forEach(box => {
+                box.className = 'key-box';
+            });
+            
+            document.querySelectorAll('.wheel-segment').forEach(segment => {
+                segment.className = segment.className.split(' ')[0] + ' ' + segment.className.split(' ')[1];
+            });
+            
+            // Get all compatible keys
+            const { perfectMatch, compatibleKeys, relativeKey, energyBoostKeys } = getCompatibleKeys(keyData);
+            
+            // Update highlights based on view mode
+            if (viewMode === 'box') {
+                // Highlight the selected key
+                const selectedBox = document.querySelector(`.key-box[data-position="${keyData.position}"]`);
+                if (selectedBox) {
+                    selectedBox.classList.add('selected');
+                }
+                
+                // Highlight perfect match
+                const perfectMatchBox = document.querySelector(`.key-box[data-position="${perfectMatch.position}"]`);
+                if (perfectMatchBox && perfectMatchBox !== selectedBox) {
+                    perfectMatchBox.classList.add('perfect-match');
+                    perfectMatchBox.querySelector('.compatibility-label').textContent = 'PERFECT MATCH';
+                }
+                
+                // Highlight compatible keys
+                compatibleKeys.forEach(compatKey => {
+                    if (compatKey) {
+                        const compatBox = document.querySelector(`.key-box[data-position="${compatKey.position}"]`);
+                        if (compatBox) {
+                            compatBox.classList.add('compatible');
+                            compatBox.querySelector('.compatibility-label').textContent = 'COMPATIBLE';
+                        }
+                    }
+                });
+                
+                // Highlight relative key
+                if (relativeKey) {
+                    const relativeBox = document.querySelector(`.key-box[data-position="${relativeKey.position}"]`);
+                    if (relativeBox) {
+                        relativeBox.classList.add('relative');
+                        relativeBox.querySelector('.compatibility-label').textContent = 'RELATIVE';
+                    }
+                }
+                
+                // Highlight energy boost keys
+                energyBoostKeys.forEach(boostKey => {
+                    if (boostKey) {
+                        const boostBox = document.querySelector(`.key-box[data-position="${boostKey.position}"]`);
+                        if (boostBox) {
+                            boostBox.classList.add('energy-boost');
+                            boostBox.querySelector('.compatibility-label').textContent = 'ENERGY BOOST';
+                        }
+                    }
+                });
+            } else {
+                // Wheel view
+                const selectedSegment = document.querySelector(`.wheel-segment[data-position="${keyData.position}"]`);
+                if (selectedSegment) {
+                    selectedSegment.classList.add('selected');
+                }
+                
+                // Highlight perfect match
+                const perfectMatchSegment = document.querySelector(`.wheel-segment[data-position="${perfectMatch.position}"]`);
+                if (perfectMatchSegment && perfectMatchSegment !== selectedSegment) {
+                    perfectMatchSegment.classList.add('perfect-match');
+                }
+                
+                // Highlight compatible keys
+                compatibleKeys.forEach(compatKey => {
+                    if (compatKey) {
+                        const compatSegment = document.querySelector(`.wheel-segment[data-position="${compatKey.position}"]`);
+                        if (compatSegment) {
+                            compatSegment.classList.add('compatible');
+                        }
+                    }
+                });
+                
+                // Highlight relative key
+                if (relativeKey) {
+                    const relativeSegment = document.querySelector(`.wheel-segment[data-position="${relativeKey.position}"]`);
+                    if (relativeSegment) {
+                        relativeSegment.classList.add('relative');
+                    }
+                }
+                
+                // Highlight energy boost keys
+                energyBoostKeys.forEach(boostKey => {
+                    if (boostKey) {
+                        const boostSegment = document.querySelector(`.wheel-segment[data-position="${boostKey.position}"]`);
+                        if (boostSegment) {
+                            boostSegment.classList.add('energy-boost');
+                        }
+                    }
+                });
+            }
+        }
+
+        // Update the info panel with selected key information
+        function updateInfoPanel() {
+            if (!selectedKey) return;
+            
+            selectedKeyElement.textContent = showAlphanumeric ? selectedKey.position : selectedKey.musical;
+            musicalNotationElement.textContent = selectedKey.musical;
+            
+            // Get all compatible keys
+            const { perfectMatch, compatibleKeys, relativeKey, energyBoostKeys } = getCompatibleKeys(selectedKey);
+            
+            // Perfect match
+            perfectMatchElement.textContent = showAlphanumeric ? perfectMatch.position : perfectMatch.musical;
+            
+            // Compatible keys
+            const compatKeysText = compatibleKeys
+                .map(key => showAlphanumeric ? key.position : key.musical)
+                .join(', ');
+            compatibleKeysElement.textContent = compatKeysText;
+            
+            // Relative key
+            relativeKeyElement.textContent = showAlphanumeric ? relativeKey.position : relativeKey.musical;
+            
+            // Energy boost keys
+            const boostKeysText = energyBoostKeys
+                .map(key => showAlphanumeric ? key.position : key.musical)
+                .join(', ');
+            energyBoostElement.textContent = boostKeysText;
+        }
+
+        // Render the current view based on mode
+        function renderView() {
+            if (viewMode === 'box') {
+                createBoxLayout();
+            } else {
+                createWheelLayout();
+            }
+        }
+
+        // Initialize the app
+        function initApp() {
+            renderView();
+        }
+
+        // Start the app
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+        });
+    </script>
 </body>
 </html>
-
-<style>
-:root {
-    --background: #f5f5f7;
-    --card-bg: #ffffff;
-    --text: #1d1d1f;
-    --border: #d2d2d7;
-    --primary: #0071e3;
-    --same-energy: #34c759;
-    --energy-boost: #ff9500;
-    --energy-drop: #5ac8fa;
-    --perfect-match: #af52de;
-    --shadow: rgba(0, 0, 0, 0.1);
-    --primary-rgb: 0, 113, 227;
-    --same-energy-rgb: 52, 199, 89;
-    --energy-boost-rgb: 255, 149, 0;
-    --energy-drop-rgb: 90, 200, 250;
-    --perfect-match-rgb: 175, 82, 222;
-}
-
-[data-theme="dark"] {
-    --background: #1d1d1f;
-    --card-bg: #2c2c2e;
-    --text: #f5f5f7;
-    --border: #3a3a3c;
-    --primary: #0a84ff;
-    --same-energy: #30d158;
-    --energy-boost: #ff9f0a;
-    --energy-drop: #64d2ff;
-    --perfect-match: #bf5af2;
-    --shadow: rgba(0, 0, 0, 0.3);
-    --primary-rgb: 10, 132, 255;
-    --same-energy-rgb: 48, 209, 88;
-    --energy-boost-rgb: 255, 159, 10;
-    --energy-drop-rgb: 100, 210, 255;
-    --perfect-match-rgb: 191, 90, 242;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-}
-
-body {
-    background-color: var(--background);
-    color: var(--text);
-    transition: all 0.3s ease;
-    min-height: 100vh;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-header {
-    width: 100%;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-h1 {
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.controls {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-    width: 100%;
-}
-
-.toggle-container {
-    display: flex;
-    align-items: center;
-    background-color: var(--card-bg);
-    border-radius: 10px;
-    overflow: hidden;
-    height: 36px;
-    box-shadow: 0 2px 10px var(--shadow);
-}
-
-.toggle-btn {
-    background: none;
-    border: none;
-    padding: 0 15px;
-    height: 100%;
-    color: var(--text);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.toggle-btn.active {
-    background-color: var(--primary);
-    color: white;
-}
-
-.theme-toggle {
-    background: none;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 18px;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    background-color: var(--card-bg);
-    cursor: pointer;
-    box-shadow: 0 2px 10px var(--shadow);
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.theme-toggle:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px var(--shadow);
-}
-
-.theme-toggle svg {
-    width: 16px;
-    height: 16px;
-    fill: currentColor;
-}
-
-main {
-    width: 100%;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-}
-
-/* Box Layout */
-.box-layout {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    width: 100%;
-}
-
-@media (max-width: 500px) {
-    .box-layout {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-.key-box {
-    aspect-ratio: 1/1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--card-bg);
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 8px var(--shadow);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.key-box:active {
-    transform: scale(0.96);
-}
-
-.key-label {
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.compatibility-label {
-    font-size: 10px;
-    font-weight: 500;
-    margin-top: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.key-box.selected {
-    box-shadow: 0 0 0 2px var(--primary), 0 4px 12px var(--shadow);
-    transform: scale(1.05);
-    z-index: 10;
-}
-
-.key-box.same-energy {
-    background-color: rgba(var(--same-energy-rgb), 0.15);
-    box-shadow: 0 0 0 1px var(--same-energy), 0 4px 12px var(--shadow);
-}
-
-.key-box.same-energy .compatibility-label {
-    color: var(--same-energy);
-    opacity: 1;
-}
-
-.key-box.energy-boost {
-    background-color: rgba(var(--energy-boost-rgb), 0.15);
-    box-shadow: 0 0 0 1px var(--energy-boost), 0 4px 12px var(--shadow);
-}
-
-.key-box.energy-boost .compatibility-label {
-    color: var(--energy-boost);
-    opacity: 1;
-}
-
-.key-box.energy-drop {
-    background-color: rgba(var(--energy-drop-rgb), 0.15);
-    box-shadow: 0 0 0 1px var(--energy-drop), 0 4px 12px var(--shadow);
-}
-
-.key-box.energy-drop .compatibility-label {
-    color: var(--energy-drop);
-    opacity: 1;
-}
-
-.key-box.perfect-match {
-    background-color: rgba(var(--perfect-match-rgb), 0.15);
-    box-shadow: 0 0 0 1px var(--perfect-match), 0 4px 12px var(--shadow);
-}
-
-.key-box.perfect-match .compatibility-label {
-    color: var(--perfect-match);
-    opacity: 1;
-}
-
-/* Wheel Layout */
-.wheel-layout {
-    width: 100%;
-    max-width: 400px;
-    aspect-ratio: 1/1;
-    position: relative;
-    margin: 0 auto;
-}
-
-.wheel-container {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    border-radius: 50%;
-    overflow: hidden;
-    box-shadow: 0 4px 20px var(--shadow);
-    background-color: var(--card-bg);
-}
-
-.wheel-segment {
-    position: absolute;
-    width: 50%;
-    height: 50%;
-    transform-origin: bottom right;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.wheel-segment.major {
-    background-color: rgba(var(--primary-rgb), 0.8);
-}
-
-.wheel-segment.minor {
-    background-color: rgba(var(--perfect-match-rgb), 0.8);
-}
-
-.wheel-segment.selected {
-    filter: brightness(1.2);
-}
-
-.wheel-segment.compatible {
-    filter: brightness(1.1);
-    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.4);
-}
-
-.segment-content {
-    transform: rotate(-75deg);
-    font-weight: 600;
-    font-size: 14px;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-/* Legend */
-.legend {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-    width: 100%;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.legend-color {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-}
-
-.legend-color.selected {
-    background-color: var(--primary);
-}
-
-.legend-color.same-energy {
-    background-color: var(--same-energy);
-}
-
-.legend-color.energy-boost {
-    background-color: var(--energy-boost);
-}
-
-.legend-color.energy-drop {
-    background-color: var(--energy-drop);
-}
-
-.legend-color.perfect-match {
-    background-color: var(--perfect-match);
-}
-
-.info-panel {
-    background-color: var(--card-bg);
-    border-radius: 16px;
-    padding: 20px;
-    width: 100%;
-    box-shadow: 0 4px 20px var(--shadow);
-    display: none;
-}
-
-.info-panel.active {
-    display: block;
-}
-
-.info-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-.info-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.info-label {
-    font-size: 12px;
-    font-weight: 500;
-    margin-bottom: 4px;
-    color: #86868b;
-}
-
-.info-value {
-    font-size: 16px;
-    font-weight: 600;
-}
-</style>
-
-
-<script>
-	// Define the wheel data for both notation types
-const wheelData = [
-    // Major keys (B)
-    { position: "12B", musical: "G♭M", angle: 0, type: "major" },
-    { position: "1B", musical: "D♭M", angle: 30, type: "major" },
-    { position: "2B", musical: "A♭M", angle: 60, type: "major" },
-    { position: "3B", musical: "E♭M", angle: 90, type: "major" },
-    { position: "4B", musical: "B♭M", angle: 120, type: "major" },
-    { position: "5B", musical: "FM", angle: 150, type: "major" },
-    { position: "6B", musical: "CM", angle: 180, type: "major" },
-    { position: "7B", musical: "GM", angle: 210, type: "major" },
-    { position: "8B", musical: "DM", angle: 240, type: "major" },
-    { position: "9B", musical: "AM", angle: 270, type: "major" },
-    { position: "10B", musical: "EM", angle: 300, type: "major" },
-    { position: "11B", musical: "BM", angle: 330, type: "major" },
-    
-    // Minor keys (A)
-    { position: "12A", musical: "E♭m", angle: 15, type: "minor" },
-    { position: "1A", musical: "B♭m", angle: 45, type: "minor" },
-    { position: "2A", musical: "Fm", angle: 75, type: "minor" },
-    { position: "3A", musical: "Cm", angle: 105, type: "minor" },
-    { position: "4A", musical: "Gm", angle: 135, type: "minor" },
-    { position: "5A", musical: "Dm", angle: 165, type: "minor" },
-    { position: "6A", musical: "Am", angle: 195, type: "minor" },
-    { position: "7A", musical: "Em", angle: 225, type: "minor" },
-    { position: "8A", musical: "Bm", angle: 255, type: "minor" },
-    { position: "9A", musical: "F♯m", angle: 285, type: "minor" },
-    { position: "10A", musical: "C♯m", angle: 315, type: "minor" },
-    { position: "11A", musical: "G♯m", angle: 345, type: "minor" }
-];
-
-// App state
-let showAlphanumeric = true;
-let viewMode = 'box';
-let isDarkMode = false;
-let selectedKey = null;
-
-// DOM references
-const boxLayout = document.getElementById('box-layout');
-const wheelLayout = document.getElementById('wheel-layout');
-const wheelContainer = document.getElementById('wheel-container');
-const boxToggle = document.getElementById('box-toggle');
-const wheelToggle = document.getElementById('wheel-toggle');
-const alphaToggle = document.getElementById('alpha-toggle');
-const musicalToggle = document.getElementById('musical-toggle');
-const themeToggle = document.getElementById('theme-toggle');
-const lightIcon = document.getElementById('light-icon');
-const darkIcon = document.getElementById('dark-icon');
-const themeText = document.getElementById('theme-text');
-const infoPanel = document.getElementById('info-panel');
-const selectedKeyElement = document.getElementById('selected-key');
-const musicalNotationElement = document.getElementById('musical-notation');
-const sameEnergyElement = document.getElementById('same-energy-key');
-const energyBoostElement = document.getElementById('energy-boost-key');
-const energyDropElement = document.getElementById('energy-drop-key');
-const perfectMatchElement = document.getElementById('perfect-match-key');
-
-// Toggle view mode
-boxToggle.addEventListener('click', () => {
-    viewMode = 'box';
-    boxToggle.classList.add('active');
-    wheelToggle.classList.remove('active');
-    boxLayout.style.display = 'grid';
-    wheelLayout.style.display = 'none';
-    renderView();
-    if (selectedKey) {
-        selectKey(selectedKey);
-    }
-});
-
-wheelToggle.addEventListener('click', () => {
-    viewMode = 'wheel';
-    wheelToggle.classList.add('active');
-    boxToggle.classList.remove('active');
-    boxLayout.style.display = 'none';
-    wheelLayout.style.display = 'block';
-    renderView();
-    if (selectedKey) {
-        selectKey(selectedKey);
-    }
-});
-
-// Toggle notation
-alphaToggle.addEventListener('click', () => {
-    showAlphanumeric = true;
-    alphaToggle.classList.add('active');
-    musicalToggle.classList.remove('active');
-    renderView();
-    if (selectedKey) {
-        updateInfoPanel();
-        selectKey(selectedKey);
-    }
-});
-
-musicalToggle.addEventListener('click', () => {
-    showAlphanumeric = false;
-    musicalToggle.classList.add('active');
-    alphaToggle.classList.remove('active');
-    renderView();
-    if (selectedKey) {
-        updateInfoPanel();
-        selectKey(selectedKey);
-    }
-});
-
-// Toggle theme
-themeToggle.addEventListener('click', () => {
-    isDarkMode = !isDarkMode;
-    if (isDarkMode) {
-        document.body.setAttribute('data-theme', 'dark');
-        lightIcon.style.display = 'none';
-        darkIcon.style.display = 'block';
-        themeText.textContent = 'Light Mode';
-    } else {
-        document.body.removeAttribute('data-theme');
-        lightIcon.style.display = 'block';
-        darkIcon.style.display = 'none';
-        themeText.textContent = 'Dark Mode';
-    }
-});
-
-// Create the box layout
-function createBoxLayout() {
-    boxLayout.innerHTML = '';
-    
-    wheelData.forEach(keyData => {
-        const box = document.createElement('div');
-        box.className = 'key-box';
-        box.setAttribute('data-position', keyData.position);
-        
-        const label = document.createElement('div');
-        label.className = 'key-label';
-        label.textContent = showAlphanumeric ? keyData.position : keyData.musical;
-        
-        const compatibility = document.createElement('div');
-        compatibility.className = 'compatibility-label';
-        
-        box.appendChild(label);
-        box.appendChild(compatibility);
-        boxLayout.appendChild(box);
-        
-        // Add click event
-        box.addEventListener('click', () => {
-            selectKey(keyData);
-        });
-    });
-}
-
-// Create the wheel layout
-function createWheelLayout() {
-    wheelContainer.innerHTML = '';
-    
-    wheelData.forEach(keyData => {
-        const segment = document.createElement('div');
-        segment.className = `wheel-segment ${keyData.type}`;
-        segment.setAttribute('data-position', keyData.position);
-        segment.style.transform = `rotate(${keyData.angle}deg)`;
-        
-        const content = document.createElement('div');
-        content.className = 'segment-content';
-        content.textContent = showAlphanumeric ? keyData.position : keyData.musical;
-        
-        segment.appendChild(content);
-        wheelContainer.appendChild(segment);
-        
-        // Add click event
-        segment.addEventListener('click', () => {
-            selectKey(keyData);
-        });
-    });
-}
-
-// Select a key
-function selectKey(keyData) {
-    selectedKey = keyData;
-    infoPanel.classList.add('active');
-    updateInfoPanel();
-    
-    // Clear all existing highlights
-    document.querySelectorAll('.key-box').forEach(box => {
-        box.className = 'key-box';
-    });
-    
-    document.querySelectorAll('.wheel-segment').forEach(segment => {
-        segment.classList.remove('selected', 'compatible');
-    });
-    
-    // Parse position number from the position string
-    const positionMatch = keyData.position.match(/(\d+)/);
-    const position = positionMatch ? parseInt(positionMatch[0]) : 0;
-    const isMinor = keyData.position.endsWith('A');
-    
-    // Same energy: same number, different letter
-    const sameEnergyPos = isMinor ? `${position}B` : `${position}A`;
-    const sameEnergy = wheelData.find(k => k.position === sameEnergyPos);
-    
-    // Energy boost: +1 position
-    let boostPos = position + 1;
-    if (boostPos > 12) boostPos = 1;
-    const boostLetter = isMinor ? 'A' : 'B';
-    const energyBoost = wheelData.find(k => k.position === `${boostPos}${boostLetter}`);
-    
-    // Energy drop: -1 position
-    let dropPos = position - 1;
-    if (dropPos < 1) dropPos = 12;
-    const dropLetter = isMinor ? 'A' : 'B';
-    const energyDrop = wheelData.find(k => k.position === `${dropPos}${dropLetter}`);
-    
-    // Perfect match: +7 positions (or -5)
-    let perfectPos = (position + 7) % 12;
-    if (perfectPos === 0) perfectPos = 12;
-    const perfectLetter = isMinor ? 'A' : 'B';
-    const perfectMatch = wheelData.find(k => k.position === `${perfectPos}${perfectLetter}`);
-    
-    // Update highlights based on view mode
-    if (viewMode === 'box') {
-        // Highlight the selected key
-        const selectedBox = document.querySelector(`.key-box[data-position="${keyData.position}"]`);
-        if (selectedBox) {
-            selectedBox.classList.add('selected');
-        }
-        
-        // Add compatibility labels
-        if (sameEnergy) {
-            const sameEnergyBox = document.querySelector(`.key-box[data-position="${sameEnergy.position}"]`);
-            if (sameEnergyBox) {
-                sameEnergyBox.classList.add('same-energy');
-                sameEnergyBox.querySelector('.compatibility-label').textContent = 'SAME ENERGY';
-            }
-        }
-        
-        if (energyBoost) {
-            const energyBoostBox = document.querySelector(`.key-box[data-position="${energyBoost.position}"]`);
-            if (energyBoostBox) {
-                energyBoostBox.classList.add('energy-boost');
-                energyBoostBox.querySelector('.compatibility-label').textContent = 'ENERGY BOOST';
-            }
-        }
-        
-        if (energyDrop) {
-            const energyDropBox = document.querySelector(`.key-box[data-position="${energyDrop.position}"]`);
-            if (energyDropBox) {
-                energyDropBox.classList.add('energy-drop');
-                energyDropBox.querySelector('.compatibility-label').textContent = 'ENERGY DROP';
-            }
-        }
-        
-        if (perfectMatch) {
-            const perfectMatchBox = document.querySelector(`.key-box[data-position="${perfectMatch.position}"]`);
-            if (perfectMatchBox) {
-                perfectMatchBox.classList.add('perfect-match');
-                perfectMatchBox.querySelector('.compatibility-label').textContent = 'PERFECT MATCH';
-            }
-        }
-    } else {
-        // Wheel view
-        const selectedSegment = document.querySelector(`.wheel-segment[data-position="${keyData.position}"]`);
-        if (selectedSegment) {
-            selectedSegment.classList.add('selected');
-        }
-        
-        // Mark compatible segments
-        const compatibleSegments = [
-            sameEnergy ? document.querySelector(`.wheel-segment[data-position="${sameEnergy.position}"]`) : null,
-            energyBoost ? document.querySelector(`.wheel-segment[data-position="${energyBoost.position}"]`) : null,
-            energyDrop ? document.querySelector(`.wheel-segment[data-position="${energyDrop.position}"]`) : null,
-            perfectMatch ? document.querySelector(`.wheel-segment[data-position="${perfectMatch.position}"]`) : null
-        ];
-        
-        compatibleSegments.forEach(segment => {
-            if (segment) {
-                segment.classList.add('compatible');
-            }
-        });
-    }
-}
-
-// Update the info panel with selected key information
-function updateInfoPanel() {
-    if (!selectedKey) return;
-    
-    selectedKeyElement.textContent = showAlphanumeric ? selectedKey.position : selectedKey.musical;
-    musicalNotationElement.textContent = selectedKey.musical;
-    
-    // Parse position number from the position string
-    const positionMatch = selectedKey.position.match(/(\d+)/);
-    const position = positionMatch ? parseInt(positionMatch[0]) : 0;
-    const isMinor = selectedKey.position.endsWith('A');
-    
-    // Same energy: same number, different letter
-    const sameEnergyPos = isMinor ? `${position}B` : `${position}A`;
-    const sameEnergy = wheelData.find(k => k.position === sameEnergyPos);
-    sameEnergyElement.textContent = showAlphanumeric ? sameEnergy.position : sameEnergy.musical;
-    
-    // Energy boost: +1 position
-let boostPos = position + 1;
-if (boostPos > 12) boostPos = 1;
-const boostLetter = isMinor ? 'A' : 'B';
-const energyBoost = wheelData.find(k => k.position === `${boostPos}${boostLetter}`);
-energyBoostElement.textContent = showAlphanumeric ? energyBoost.position : energyBoost.musical;
-
-// Energy drop: -1 position
-let dropPos = position - 1;
-if (dropPos < 1) dropPos = 12;
-const dropLetter = isMinor ? 'A' : 'B';
-const energyDrop = wheelData.find(k => k.position === `${dropPos}${dropLetter}`);
-energyDropElement.textContent = showAlphanumeric ? energyDrop.position : energyDrop.musical;
-
-// Perfect match: +7 positions (or -5)
-let perfectPos = (position + 7) % 12;
-if (perfectPos === 0) perfectPos = 12;
-const perfectLetter = isMinor ? 'A' : 'B';
-const perfectMatch = wheelData.find(k => k.position === `${perfectPos}${perfectLetter}`);
-perfectMatchElement.textContent = showAlphanumeric ? perfectMatch.position : perfectMatch.musical;
-}
-
-// Render the current view based on mode
-function renderView() {
-    if (viewMode === 'box') {
-        createBoxLayout();
-    } else {
-        createWheelLayout();
-    }
-}
-
-// Initialize the app
-function initApp() {
-    renderView();
-}
-
-// Start the app
-window.addEventListener('DOMContentLoaded', () => {
-    initApp();
-});
-</script>
