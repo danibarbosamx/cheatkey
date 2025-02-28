@@ -4,395 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camelot Wheel</title>
-    <style>
-        :root {
-            --background: #f5f5f7;
-            --card-bg: #ffffff;
-            --text: #1d1d1f;
-            --border: #d2d2d7;
-            --primary: #0071e3;
-            --same-energy: #34c759;
-            --energy-boost: #ff9500;
-            --energy-drop: #5ac8fa;
-            --perfect-match: #af52de;
-            --shadow: rgba(0, 0, 0, 0.1);
-        }
-        
-        [data-theme="dark"] {
-            --background: #1d1d1f;
-            --card-bg: #2c2c2e;
-            --text: #f5f5f7;
-            --border: #3a3a3c;
-            --primary: #0a84ff;
-            --same-energy: #30d158;
-            --energy-boost: #ff9f0a;
-            --energy-drop: #64d2ff;
-            --perfect-match: #bf5af2;
-            --shadow: rgba(0, 0, 0, 0.3);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        
-        body {
-            background-color: var(--background);
-            color: var(--text);
-            transition: all 0.3s ease;
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        header {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            overflow: hidden;
-            height: 36px;
-            box-shadow: 0 2px 10px var(--shadow);
-        }
-        
-        .toggle-btn {
-            background: none;
-            border: none;
-            padding: 0 15px;
-            height: 100%;
-            color: var(--text);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        
-        .toggle-btn.active {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .theme-toggle {
-            background: none;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 18px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text);
-            background-color: var(--card-bg);
-            cursor: pointer;
-            box-shadow: 0 2px 10px var(--shadow);
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .theme-toggle:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px var(--shadow);
-        }
-        
-        .theme-toggle svg {
-            width: 16px;
-            height: 16px;
-            fill: currentColor;
-        }
-        
-        main {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        /* Box Layout */
-        .box-layout {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            width: 100%;
-        }
-        
-        @media (max-width: 500px) {
-            .box-layout {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        
-        .key-box {
-            aspect-ratio: 1/1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 8px var(--shadow);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .key-box:active {
-            transform: scale(0.96);
-        }
-        
-        .key-label {
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .compatibility-label {
-            font-size: 10px;
-            font-weight: 500;
-            margin-top: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-        
-        .key-box.selected {
-            box-shadow: 0 0 0 2px var(--primary), 0 4px 12px var(--shadow);
-            transform: scale(1.05);
-            z-index: 10;
-        }
-        
-        .key-box.same-energy {
-            background-color: rgba(var(--same-energy-rgb), 0.15);
-            box-shadow: 0 0 0 1px var(--same-energy), 0 4px 12px var(--shadow);
-        }
-        
-        .key-box.same-energy .compatibility-label {
-            color: var(--same-energy);
-            opacity: 1;
-        }
-        
-        .key-box.energy-boost {
-            background-color: rgba(var(--energy-boost-rgb), 0.15);
-            box-shadow: 0 0 0 1px var(--energy-boost), 0 4px 12px var(--shadow);
-        }
-        
-        .key-box.energy-boost .compatibility-label {
-            color: var(--energy-boost);
-            opacity: 1;
-        }
-        
-        .key-box.energy-drop {
-            background-color: rgba(var(--energy-drop-rgb), 0.15);
-            box-shadow: 0 0 0 1px var(--energy-drop), 0 4px 12px var(--shadow);
-        }
-        
-        .key-box.energy-drop .compatibility-label {
-            color: var(--energy-drop);
-            opacity: 1;
-        }
-        
-        .key-box.perfect-match {
-            background-color: rgba(var(--perfect-match-rgb), 0.15);
-            box-shadow: 0 0 0 1px var(--perfect-match), 0 4px 12px var(--shadow);
-        }
-        
-        .key-box.perfect-match .compatibility-label {
-            color: var(--perfect-match);
-            opacity: 1;
-        }
-        
-        /* Wheel Layout */
-        .wheel-layout {
-            width: 100%;
-            max-width: 400px;
-            aspect-ratio: 1/1;
-            position: relative;
-            margin: 0 auto;
-        }
-        
-        .wheel-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            border-radius: 50%;
-            overflow: hidden;
-            box-shadow: 0 4px 20px var(--shadow);
-            background-color: var(--card-bg);
-        }
-        
-        .wheel-segment {
-            position: absolute;
-            width: 50%;
-            height: 50%;
-            transform-origin: bottom right;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        
-        .wheel-segment.major {
-            background-color: rgba(var(--primary-rgb), 0.8);
-        }
-        
-        .wheel-segment.minor {
-            background-color: rgba(var(--perfect-match-rgb), 0.8);
-        }
-        
-        .wheel-segment.selected {
-            filter: brightness(1.2);
-        }
-        
-        .wheel-segment.compatible {
-            filter: brightness(1.1);
-            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.4);
-        }
-        
-        .segment-content {
-            transform: rotate(-75deg);
-            font-weight: 600;
-            font-size: 14px;
-            color: white;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        }
-        
-        /* Legend */
-        .legend {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-            width: 100%;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 3px;
-        }
-        
-        .legend-color.selected {
-            background-color: var(--primary);
-        }
-        
-        .legend-color.same-energy {
-            background-color: var(--same-energy);
-        }
-        
-        .legend-color.energy-boost {
-            background-color: var(--energy-boost);
-        }
-        
-        .legend-color.energy-drop {
-            background-color: var(--energy-drop);
-        }
-        
-        .legend-color.perfect-match {
-            background-color: var(--perfect-match);
-        }
-        
-        .info-panel {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            width: 100%;
-            box-shadow: 0 4px 20px var(--shadow);
-            display: none;
-        }
-        
-        .info-panel.active {
-            display: block;
-        }
-        
-        .info-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .info-label {
-            font-size: 12px;
-            font-weight: 500;
-            margin-bottom: 4px;
-            color: #86868b;
-        }
-        
-        .info-value {
-            font-size: 16px;
-            font-weight: 600;
-        }
-        
-        /* Utility classes for the RGB values */
-        :root {
-            --primary-rgb: 0, 113, 227;
-            --same-energy-rgb: 52, 199, 89;
-            --energy-boost-rgb: 255, 149, 0;
-            --energy-drop-rgb: 90, 200, 250;
-            --perfect-match-rgb: 175, 82, 222;
-        }
-        
-        [data-theme="dark"] {
-            --primary-rgb: 10, 132, 255;
-            --same-energy-rgb: 48, 209, 88;
-            --energy-boost-rgb: 255, 159, 10;
-            --energy-drop-rgb: 100, 210, 255;
-            --perfect-match-rgb: 191, 90, 242;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
@@ -486,246 +98,727 @@
         </div>
     </main>
     
-    <script>
-        // Define the wheel data for both notation types
-        const wheelData = [
-            // Major keys (B)
-            { position: "12B", musical: "G♭M", angle: 0, type: "major" },
-            { position: "1B", musical: "D♭M", angle: 30, type: "major" },
-            { position: "2B", musical: "A♭M", angle: 60, type: "major" },
-            { position: "3B", musical: "E♭M", angle: 90, type: "major" },
-            { position: "4B", musical: "B♭M", angle: 120, type: "major" },
-            { position: "5B", musical: "FM", angle: 150, type: "major" },
-            { position: "6B", musical: "CM", angle: 180, type: "major" },
-            { position: "7B", musical: "GM", angle: 210, type: "major" },
-            { position: "8B", musical: "DM", angle: 240, type: "major" },
-            { position: "9B", musical: "AM", angle: 270, type: "major" },
-            { position: "10B", musical: "EM", angle: 300, type: "major" },
-            { position: "11B", musical: "BM", angle: 330, type: "major" },
-            
-            // Minor keys (A)
-            { position: "12A", musical: "E♭m", angle: 15, type: "minor" },
-            { position: "1A", musical: "B♭m", angle: 45, type: "minor" },
-            { position: "2A", musical: "Fm", angle: 75, type: "minor" },
-            { position: "3A", musical: "Cm", angle: 105, type: "minor" },
-            { position: "4A", musical: "Gm", angle: 135, type: "minor" },
-            { position: "5A", musical: "Dm", angle: 165, type: "minor" },
-            { position: "6A", musical: "Am", angle: 195, type: "minor" },
-            { position: "7A", musical: "Em", angle: 225, type: "minor" },
-            { position: "8A", musical: "Bm", angle: 255, type: "minor" },
-            { position: "9A", musical: "F♯m", angle: 285, type: "minor" },
-            { position: "10A", musical: "C♯m", angle: 315, type: "minor" },
-            { position: "11A", musical: "G♯m", angle: 345, type: "minor" }
-        ];
+    <script src="script.js"></script>
+</body>
+</html>
 
-        // App state
-        let showAlphanumeric = true;
-        let viewMode = 'box';
-        let isDarkMode = false;
-        let selectedKey = null;
+<style>
+:root {
+    --background: #f5f5f7;
+    --card-bg: #ffffff;
+    --text: #1d1d1f;
+    --border: #d2d2d7;
+    --primary: #0071e3;
+    --same-energy: #34c759;
+    --energy-boost: #ff9500;
+    --energy-drop: #5ac8fa;
+    --perfect-match: #af52de;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --primary-rgb: 0, 113, 227;
+    --same-energy-rgb: 52, 199, 89;
+    --energy-boost-rgb: 255, 149, 0;
+    --energy-drop-rgb: 90, 200, 250;
+    --perfect-match-rgb: 175, 82, 222;
+}
+
+[data-theme="dark"] {
+    --background: #1d1d1f;
+    --card-bg: #2c2c2e;
+    --text: #f5f5f7;
+    --border: #3a3a3c;
+    --primary: #0a84ff;
+    --same-energy: #30d158;
+    --energy-boost: #ff9f0a;
+    --energy-drop: #64d2ff;
+    --perfect-match: #bf5af2;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --primary-rgb: 10, 132, 255;
+    --same-energy-rgb: 48, 209, 88;
+    --energy-boost-rgb: 255, 159, 10;
+    --energy-drop-rgb: 100, 210, 255;
+    --perfect-match-rgb: 191, 90, 242;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text);
+    transition: all 0.3s ease;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    height: 36px;
+    box-shadow: 0 2px 10px var(--shadow);
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    padding: 0 15px;
+    height: 100%;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.toggle-btn.active {
+    background-color: var(--primary);
+    color: white;
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 18px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    background-color: var(--card-bg);
+    cursor: pointer;
+    box-shadow: 0 2px 10px var(--shadow);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.theme-toggle:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+.theme-toggle svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+main {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Box Layout */
+.box-layout {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    width: 100%;
+}
+
+@media (max-width: 500px) {
+    .box-layout {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.key-box {
+    aspect-ratio: 1/1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px var(--shadow);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.key-box:active {
+    transform: scale(0.96);
+}
+
+.key-label {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.compatibility-label {
+    font-size: 10px;
+    font-weight: 500;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.key-box.selected {
+    box-shadow: 0 0 0 2px var(--primary), 0 4px 12px var(--shadow);
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+.key-box.same-energy {
+    background-color: rgba(var(--same-energy-rgb), 0.15);
+    box-shadow: 0 0 0 1px var(--same-energy), 0 4px 12px var(--shadow);
+}
+
+.key-box.same-energy .compatibility-label {
+    color: var(--same-energy);
+    opacity: 1;
+}
+
+.key-box.energy-boost {
+    background-color: rgba(var(--energy-boost-rgb), 0.15);
+    box-shadow: 0 0 0 1px var(--energy-boost), 0 4px 12px var(--shadow);
+}
+
+.key-box.energy-boost .compatibility-label {
+    color: var(--energy-boost);
+    opacity: 1;
+}
+
+.key-box.energy-drop {
+    background-color: rgba(var(--energy-drop-rgb), 0.15);
+    box-shadow: 0 0 0 1px var(--energy-drop), 0 4px 12px var(--shadow);
+}
+
+.key-box.energy-drop .compatibility-label {
+    color: var(--energy-drop);
+    opacity: 1;
+}
+
+.key-box.perfect-match {
+    background-color: rgba(var(--perfect-match-rgb), 0.15);
+    box-shadow: 0 0 0 1px var(--perfect-match), 0 4px 12px var(--shadow);
+}
+
+.key-box.perfect-match .compatibility-label {
+    color: var(--perfect-match);
+    opacity: 1;
+}
+
+/* Wheel Layout */
+.wheel-layout {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 1/1;
+    position: relative;
+    margin: 0 auto;
+}
+
+.wheel-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 4px 20px var(--shadow);
+    background-color: var(--card-bg);
+}
+
+.wheel-segment {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    transform-origin: bottom right;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.wheel-segment.major {
+    background-color: rgba(var(--primary-rgb), 0.8);
+}
+
+.wheel-segment.minor {
+    background-color: rgba(var(--perfect-match-rgb), 0.8);
+}
+
+.wheel-segment.selected {
+    filter: brightness(1.2);
+}
+
+.wheel-segment.compatible {
+    filter: brightness(1.1);
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.4);
+}
+
+.segment-content {
+    transform: rotate(-75deg);
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Legend */
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.legend-color.selected {
+    background-color: var(--primary);
+}
+
+.legend-color.same-energy {
+    background-color: var(--same-energy);
+}
+
+.legend-color.energy-boost {
+    background-color: var(--energy-boost);
+}
+
+.legend-color.energy-drop {
+    background-color: var(--energy-drop);
+}
+
+.legend-color.perfect-match {
+    background-color: var(--perfect-match);
+}
+
+.info-panel {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px;
+    width: 100%;
+    box-shadow: 0 4px 20px var(--shadow);
+    display: none;
+}
+
+.info-panel.active {
+    display: block;
+}
+
+.info-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #86868b;
+}
+
+.info-value {
+    font-size: 16px;
+    font-weight: 600;
+}
+</style>
+
+
+<script>
+	// Define the wheel data for both notation types
+const wheelData = [
+    // Major keys (B)
+    { position: "12B", musical: "G♭M", angle: 0, type: "major" },
+    { position: "1B", musical: "D♭M", angle: 30, type: "major" },
+    { position: "2B", musical: "A♭M", angle: 60, type: "major" },
+    { position: "3B", musical: "E♭M", angle: 90, type: "major" },
+    { position: "4B", musical: "B♭M", angle: 120, type: "major" },
+    { position: "5B", musical: "FM", angle: 150, type: "major" },
+    { position: "6B", musical: "CM", angle: 180, type: "major" },
+    { position: "7B", musical: "GM", angle: 210, type: "major" },
+    { position: "8B", musical: "DM", angle: 240, type: "major" },
+    { position: "9B", musical: "AM", angle: 270, type: "major" },
+    { position: "10B", musical: "EM", angle: 300, type: "major" },
+    { position: "11B", musical: "BM", angle: 330, type: "major" },
+    
+    // Minor keys (A)
+    { position: "12A", musical: "E♭m", angle: 15, type: "minor" },
+    { position: "1A", musical: "B♭m", angle: 45, type: "minor" },
+    { position: "2A", musical: "Fm", angle: 75, type: "minor" },
+    { position: "3A", musical: "Cm", angle: 105, type: "minor" },
+    { position: "4A", musical: "Gm", angle: 135, type: "minor" },
+    { position: "5A", musical: "Dm", angle: 165, type: "minor" },
+    { position: "6A", musical: "Am", angle: 195, type: "minor" },
+    { position: "7A", musical: "Em", angle: 225, type: "minor" },
+    { position: "8A", musical: "Bm", angle: 255, type: "minor" },
+    { position: "9A", musical: "F♯m", angle: 285, type: "minor" },
+    { position: "10A", musical: "C♯m", angle: 315, type: "minor" },
+    { position: "11A", musical: "G♯m", angle: 345, type: "minor" }
+];
+
+// App state
+let showAlphanumeric = true;
+let viewMode = 'box';
+let isDarkMode = false;
+let selectedKey = null;
+
+// DOM references
+const boxLayout = document.getElementById('box-layout');
+const wheelLayout = document.getElementById('wheel-layout');
+const wheelContainer = document.getElementById('wheel-container');
+const boxToggle = document.getElementById('box-toggle');
+const wheelToggle = document.getElementById('wheel-toggle');
+const alphaToggle = document.getElementById('alpha-toggle');
+const musicalToggle = document.getElementById('musical-toggle');
+const themeToggle = document.getElementById('theme-toggle');
+const lightIcon = document.getElementById('light-icon');
+const darkIcon = document.getElementById('dark-icon');
+const themeText = document.getElementById('theme-text');
+const infoPanel = document.getElementById('info-panel');
+const selectedKeyElement = document.getElementById('selected-key');
+const musicalNotationElement = document.getElementById('musical-notation');
+const sameEnergyElement = document.getElementById('same-energy-key');
+const energyBoostElement = document.getElementById('energy-boost-key');
+const energyDropElement = document.getElementById('energy-drop-key');
+const perfectMatchElement = document.getElementById('perfect-match-key');
+
+// Toggle view mode
+boxToggle.addEventListener('click', () => {
+    viewMode = 'box';
+    boxToggle.classList.add('active');
+    wheelToggle.classList.remove('active');
+    boxLayout.style.display = 'grid';
+    wheelLayout.style.display = 'none';
+    renderView();
+    if (selectedKey) {
+        selectKey(selectedKey);
+    }
+});
+
+wheelToggle.addEventListener('click', () => {
+    viewMode = 'wheel';
+    wheelToggle.classList.add('active');
+    boxToggle.classList.remove('active');
+    boxLayout.style.display = 'none';
+    wheelLayout.style.display = 'block';
+    renderView();
+    if (selectedKey) {
+        selectKey(selectedKey);
+    }
+});
+
+// Toggle notation
+alphaToggle.addEventListener('click', () => {
+    showAlphanumeric = true;
+    alphaToggle.classList.add('active');
+    musicalToggle.classList.remove('active');
+    renderView();
+    if (selectedKey) {
+        updateInfoPanel();
+        selectKey(selectedKey);
+    }
+});
+
+musicalToggle.addEventListener('click', () => {
+    showAlphanumeric = false;
+    musicalToggle.classList.add('active');
+    alphaToggle.classList.remove('active');
+    renderView();
+    if (selectedKey) {
+        updateInfoPanel();
+        selectKey(selectedKey);
+    }
+});
+
+// Toggle theme
+themeToggle.addEventListener('click', () => {
+    isDarkMode = !isDarkMode;
+    if (isDarkMode) {
+        document.body.setAttribute('data-theme', 'dark');
+        lightIcon.style.display = 'none';
+        darkIcon.style.display = 'block';
+        themeText.textContent = 'Light Mode';
+    } else {
+        document.body.removeAttribute('data-theme');
+        lightIcon.style.display = 'block';
+        darkIcon.style.display = 'none';
+        themeText.textContent = 'Dark Mode';
+    }
+});
+
+// Create the box layout
+function createBoxLayout() {
+    boxLayout.innerHTML = '';
+    
+    wheelData.forEach(keyData => {
+        const box = document.createElement('div');
+        box.className = 'key-box';
+        box.setAttribute('data-position', keyData.position);
         
-        // DOM references
-        const boxLayout = document.getElementById('box-layout');
-        const wheelLayout = document.getElementById('wheel-layout');
-        const wheelContainer = document.getElementById('wheel-container');
-        const boxToggle = document.getElementById('box-toggle');
-        const wheelToggle = document.getElementById('wheel-toggle');
-        const alphaToggle = document.getElementById('alpha-toggle');
-        const musicalToggle = document.getElementById('musical-toggle');
-        const themeToggle = document.getElementById('theme-toggle');
-        const lightIcon = document.getElementById('light-icon');
-        const darkIcon = document.getElementById('dark-icon');
-        const themeText = document.getElementById('theme-text');
-        const infoPanel = document.getElementById('info-panel');
-        const selectedKeyElement = document.getElementById('selected-key');
-        const musicalNotationElement = document.getElementById('musical-notation');
-        const sameEnergyElement = document.getElementById('same-energy-key');
-        const energyBoostElement = document.getElementById('energy-boost-key');
-        const energyDropElement = document.getElementById('energy-drop-key');
-        const perfectMatchElement = document.getElementById('perfect-match-key');
+        const label = document.createElement('div');
+        label.className = 'key-label';
+        label.textContent = showAlphanumeric ? keyData.position : keyData.musical;
         
-        // Toggle view mode
-        boxToggle.addEventListener('click', () => {
-            viewMode = 'box';
-            boxToggle.classList.add('active');
-            wheelToggle.classList.remove('active');
-            boxLayout.style.display = 'grid';
-            wheelLayout.style.display = 'none';
-            renderView();
+        const compatibility = document.createElement('div');
+        compatibility.className = 'compatibility-label';
+        
+        box.appendChild(label);
+        box.appendChild(compatibility);
+        boxLayout.appendChild(box);
+        
+        // Add click event
+        box.addEventListener('click', () => {
+            selectKey(keyData);
         });
+    });
+}
+
+// Create the wheel layout
+function createWheelLayout() {
+    wheelContainer.innerHTML = '';
+    
+    wheelData.forEach(keyData => {
+        const segment = document.createElement('div');
+        segment.className = `wheel-segment ${keyData.type}`;
+        segment.setAttribute('data-position', keyData.position);
+        segment.style.transform = `rotate(${keyData.angle}deg)`;
         
-        wheelToggle.addEventListener('click', () => {
-            viewMode = 'wheel';
-            wheelToggle.classList.add('active');
-            boxToggle.classList.remove('active');
-            boxLayout.style.display = 'none';
-            wheelLayout.style.display = 'block';
-            renderView();
+        const content = document.createElement('div');
+        content.className = 'segment-content';
+        content.textContent = showAlphanumeric ? keyData.position : keyData.musical;
+        
+        segment.appendChild(content);
+        wheelContainer.appendChild(segment);
+        
+        // Add click event
+        segment.addEventListener('click', () => {
+            selectKey(keyData);
         });
+    });
+}
+
+// Select a key
+function selectKey(keyData) {
+    selectedKey = keyData;
+    infoPanel.classList.add('active');
+    updateInfoPanel();
+    
+    // Clear all existing highlights
+    document.querySelectorAll('.key-box').forEach(box => {
+        box.className = 'key-box';
+    });
+    
+    document.querySelectorAll('.wheel-segment').forEach(segment => {
+        segment.classList.remove('selected', 'compatible');
+    });
+    
+    // Parse position number from the position string
+    const positionMatch = keyData.position.match(/(\d+)/);
+    const position = positionMatch ? parseInt(positionMatch[0]) : 0;
+    const isMinor = keyData.position.endsWith('A');
+    
+    // Same energy: same number, different letter
+    const sameEnergyPos = isMinor ? `${position}B` : `${position}A`;
+    const sameEnergy = wheelData.find(k => k.position === sameEnergyPos);
+    
+    // Energy boost: +1 position
+    let boostPos = position + 1;
+    if (boostPos > 12) boostPos = 1;
+    const boostLetter = isMinor ? 'A' : 'B';
+    const energyBoost = wheelData.find(k => k.position === `${boostPos}${boostLetter}`);
+    
+    // Energy drop: -1 position
+    let dropPos = position - 1;
+    if (dropPos < 1) dropPos = 12;
+    const dropLetter = isMinor ? 'A' : 'B';
+    const energyDrop = wheelData.find(k => k.position === `${dropPos}${dropLetter}`);
+    
+    // Perfect match: +7 positions (or -5)
+    let perfectPos = (position + 7) % 12;
+    if (perfectPos === 0) perfectPos = 12;
+    const perfectLetter = isMinor ? 'A' : 'B';
+    const perfectMatch = wheelData.find(k => k.position === `${perfectPos}${perfectLetter}`);
+    
+    // Update highlights based on view mode
+    if (viewMode === 'box') {
+        // Highlight the selected key
+        const selectedBox = document.querySelector(`.key-box[data-position="${keyData.position}"]`);
+        if (selectedBox) {
+            selectedBox.classList.add('selected');
+        }
         
-        // Toggle notation
-        alphaToggle.addEventListener('click', () => {
-            showAlphanumeric = true;
-            alphaToggle.classList.add('active');
-            musicalToggle.classList.remove('active');
-            renderView();
-            updateInfoPanel();
-        });
-        
-        musicalToggle.addEventListener('click', () => {
-            showAlphanumeric = false;
-            musicalToggle.classList.add('active');
-            alphaToggle.classList.remove('active');
-            renderView();
-            updateInfoPanel();
-        });
-        
-        // Toggle theme
-        themeToggle.addEventListener('click', () => {
-            isDarkMode = !isDarkMode;
-            if (isDarkMode) {
-                document.body.setAttribute('data-theme', 'dark');
-                lightIcon.style.display = 'none';
-                darkIcon.style.display = 'block';
-                themeText.textContent = 'Light Mode';
-            } else {
-                document.body.removeAttribute('data-theme');
-                lightIcon.style.display = 'block';
-                darkIcon.style.display = 'none';
-                themeText.textContent = 'Dark Mode';
-            }
-        });
-        
-        // Select a key
-        function selectKey(keyData) {
-            selectedKey = keyData;
-            infoPanel.classList.add('active');
-            updateInfoPanel();
-            
-            // Clear all existing highlights
-            document.querySelectorAll('.key-box').forEach(box => {
-                box.className = 'key-box';
-            });
-            
-            document.querySelectorAll('.wheel-segment').forEach(segment => {
-                segment.classList.remove('selected', 'compatible');
-            });
-            
-            // Find compatible keys
-            const position = parseInt(keyData.position, 10) || parseInt(keyData.position.slice(0, -1), 10);
-            const isMinor = keyData.position.endsWith('A');
-            
-            // Same energy: same number, different letter
-            const sameEnergyPos = isMinor ? `${position}B` : `${position}A`;
-            const sameEnergy = wheelData.find(k => k.position === sameEnergyPos);
-            
-            // Energy boost: +1 position
-            let boostPos = position + 1;
-            if (boostPos > 12) boostPos = 1;
-            const boostLetter = isMinor ? 'A' : 'B';
-            const energyBoost = wheelData.find(k => k.position === `${boostPos}${boostLetter}`);
-            
-            // Energy drop: -1 position
-            let dropPos = position - 1;
-            if (dropPos < 1) dropPos = 12;
-            const dropLetter = isMinor ? 'A' : 'B';
-            const energyDrop = wheelData.find(k => k.position === `${dropPos}${dropLetter}`);
-            
-            // Perfect match: +7 positions (or -5)
-            let perfectPos = (position + 7) % 12;
-            if (perfectPos === 0) perfectPos = 12;
-            const perfectLetter = isMinor ? 'A' : 'B';
-            const perfectMatch = wheelData.find(k => k.position === `${perfectPos}${perfectLetter}`);
-            
-            // Update highlights based on view mode
-            if (viewMode === 'box') {
-                // Highlight the selected key
-                const selectedBox = document.querySelector(`.key-box[data-position="${keyData.position}"]`);
-                if (selectedBox) {
-                    selectedBox.classList.add('selected');
-                }
-                
-                // Highlight compatible keys
-                const sameEnergyBox = document.querySelector(`.key-box[data-position="${sameEnergy.position}"]`);
-                if (sameEnergyBox) {
-                    sameEnergyBox.classList.add('same-energy');
-                }
-                
-                const energyBoostBox = document.querySelector(`.key-box[data-position="${energyBoost.position}"]`);
-                if (energyBoostBox) {
-                    energyBoostBox.classList.add('energy-boost');
-                }
-                
-                const energyDropBox = document.querySelector(`.key-box[data-position="${energyDrop.position}"]`);
-                if (energyDropBox) {
-                    energyDropBox.classList.add('energy-drop');
-                }
-                
-                const perfectMatchBox = document.querySelector(`.key-box[data-position="${perfectMatch.position}"]`);
-                if (perfectMatchBox) {
-                    perfectMatchBox.classList.add('perfect-match');
-                }
-            } else {
-                // Wheel view
-                const selectedSegment = document.querySelector(`.wheel-segment[data-position="${keyData.position}"]`);
-                if (selectedSegment) {
-                    selectedSegment.classList.add('selected');
-                }
-                
-                // Mark compatible segments
-                const compatibleSegments = [
-                    document.querySelector(`.wheel-segment[data-position="${sameEnergy.position}"]`),
-                    document.querySelector(`.wheel-segment[data-position="${energyBoost.position}"]`),
-                    document.querySelector(`.wheel-segment[data-position="${energyDrop.position}"]`),
-                    document.querySelector(`.wheel-segment[data-position="${perfectMatch.position}"]`)
-                ];
-                
-                compatibleSegments.forEach(segment => {
-                    if (segment) {
-                        segment.classList.add('compatible');
-                    }
-                });
+        // Add compatibility labels
+        if (sameEnergy) {
+            const sameEnergyBox = document.querySelector(`.key-box[data-position="${sameEnergy.position}"]`);
+            if (sameEnergyBox) {
+                sameEnergyBox.classList.add('same-energy');
+                sameEnergyBox.querySelector('.compatibility-label').textContent = 'SAME ENERGY';
             }
         }
         
-        // Update the info panel with selected key information
-        function updateInfoPanel() {
-            if (!selectedKey) return;
-            
-            selectedKeyElement.textContent = showAlphanumeric ? selectedKey.position : selectedKey.musical;
-            musicalNotationElement.textContent = selectedKey.musical;
-            
-            // Find compatible keys
-            const position = parseInt(selectedKey.position, 10) || parseInt(selectedKey.position.slice(0, -1), 10);
-            const isMinor = selectedKey.position.endsWith('A');
-            
-            // Same energy
-            const sameEnergyPos = isMinor ? `${position}B` : `${position}A`;
-            const sameEnergy = wheelData.find(k => k.position === sameEnergyPos);
-            sameEnergyElement.textContent = showAlphanumeric ? sameEnergy.position : sameEnergy.musical;
-            
-            // Energy boost
-            let boostPos = position + 1;
-            if (boostPos > 12) boostPos = 1;
-            const boostLetter = isMinor ? 'A' : 'B';
-            const energyBoost = wheelData.find(k => k.position === `${boostPos}${boostLetter}`);
-            energyBoostElement.textContent = showAlphanumeric ? energyBoost.position : energyBoost.musical;
-            
-            // Energy drop
-            let dropPos = position - 1;
-            if (dropPos < 1) dropPos = 12;
-            const dropLetter = isMinor ? 'A' : 'B';
-            const energyDrop = wheelData.find(k => k.position === `${dropPos}${dropLetter}`);
-            energyDropElement.textContent = showAlphanumeric ? energyDrop.position : energyDrop.musical;
-            
-            // Perfect match
-            let perfectPos = (position + 7) % 12;
-            if (perfectPos === 0) perfectPos = 12;
-            const perfectLetter = isMinor ? 'A' : 'B';
-            const perfectMatch = wheelData.find(k => k.position === `${perfectPos}${perfectLetter}`);
-            perfectMatchElement.textContent = showAlphanumeric ? perfectMatch.position : perfectMatch.musical;
+        if (energyBoost) {
+            const energyBoostBox = document.querySelector(`.key-box[data-position="${energyBoost.position}"]`);
+            if (energyBoostBox) {
+                energyBoostBox.classList.add('energy-boost');
+                energyBoostBox.querySelector('.compatibility-label').textContent = 'ENERGY BOOST';
+            }
         }
         
-        // Render the current view based on mode
-        function renderView() {
-            if (viewMode === 
+        if (energyDrop) {
+            const energyDropBox = document.querySelector(`.key-box[data-position="${energyDrop.position}"]`);
+            if (energyDropBox) {
+                energyDropBox.classList.add('energy-drop');
+                energyDropBox.querySelector('.compatibility-label').textContent = 'ENERGY DROP';
+            }
+        }
+        
+        if (perfectMatch) {
+            const perfectMatchBox = document.querySelector(`.key-box[data-position="${perfectMatch.position}"]`);
+            if (perfectMatchBox) {
+                perfectMatchBox.classList.add('perfect-match');
+                perfectMatchBox.querySelector('.compatibility-label').textContent = 'PERFECT MATCH';
+            }
+        }
+    } else {
+        // Wheel view
+        const selectedSegment = document.querySelector(`.wheel-segment[data-position="${keyData.position}"]`);
+        if (selectedSegment) {
+            selectedSegment.classList.add('selected');
+        }
+        
+        // Mark compatible segments
+        const compatibleSegments = [
+            sameEnergy ? document.querySelector(`.wheel-segment[data-position="${sameEnergy.position}"]`) : null,
+            energyBoost ? document.querySelector(`.wheel-segment[data-position="${energyBoost.position}"]`) : null,
+            energyDrop ? document.querySelector(`.wheel-segment[data-position="${energyDrop.position}"]`) : null,
+            perfectMatch ? document.querySelector(`.wheel-segment[data-position="${perfectMatch.position}"]`) : null
+        ];
+        
+        compatibleSegments.forEach(segment => {
+            if (segment) {
+                segment.classList.add('compatible');
+            }
+        });
+    }
+}
+
+// Update the info panel with selected key information
+function updateInfoPanel() {
+    if (!selectedKey) return;
+    
+    selectedKeyElement.textContent = showAlphanumeric ? selectedKey.position : selectedKey.musical;
+    musicalNotationElement.textContent = selectedKey.musical;
+    
+    // Parse position number from the position string
+    const positionMatch = selectedKey.position.match(/(\d+)/);
+    const position = positionMatch ? parseInt(positionMatch[0]) : 0;
+    const isMinor = selectedKey.position.endsWith('A');
+    
+    // Same energy: same number, different letter
+    const sameEnergyPos = isMinor ? `${position}B` : `${position}A`;
+    const sameEnergy = wheelData.find(k => k.position === sameEnergyPos);
+    sameEnergyElement.textContent = showAlphanumeric ? sameEnergy.position : sameEnergy.musical;
+    
+    // Energy boost: +1 position
+let boostPos = position + 1;
+if (boostPos > 12) boostPos = 1;
+const boostLetter = isMinor ? 'A' : 'B';
+const energyBoost = wheelData.find(k => k.position === `${boostPos}${boostLetter}`);
+energyBoostElement.textContent = showAlphanumeric ? energyBoost.position : energyBoost.musical;
+
+// Energy drop: -1 position
+let dropPos = position - 1;
+if (dropPos < 1) dropPos = 12;
+const dropLetter = isMinor ? 'A' : 'B';
+const energyDrop = wheelData.find(k => k.position === `${dropPos}${dropLetter}`);
+energyDropElement.textContent = showAlphanumeric ? energyDrop.position : energyDrop.musical;
+
+// Perfect match: +7 positions (or -5)
+let perfectPos = (position + 7) % 12;
+if (perfectPos === 0) perfectPos = 12;
+const perfectLetter = isMinor ? 'A' : 'B';
+const perfectMatch = wheelData.find(k => k.position === `${perfectPos}${perfectLetter}`);
+perfectMatchElement.textContent = showAlphanumeric ? perfectMatch.position : perfectMatch.musical;
+}
+
+// Render the current view based on mode
+function renderView() {
+    if (viewMode === 'box') {
+        createBoxLayout();
+    } else {
+        createWheelLayout();
+    }
+}
+
+// Initialize the app
+function initApp() {
+    renderView();
+}
+
+// Start the app
+window.addEventListener('DOMContentLoaded', () => {
+    initApp();
+});
+</script>
